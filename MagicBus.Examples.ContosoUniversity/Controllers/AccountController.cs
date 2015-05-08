@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Transactions;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
@@ -10,6 +9,7 @@ using Microsoft.Web.WebPages.OAuth;
 using WebMatrix.WebData;
 using ContosoUniversity.Filters;
 using ContosoUniversity.Models;
+using MagicBus;
 
 namespace ContosoUniversity.Controllers
 {
@@ -17,7 +17,14 @@ namespace ContosoUniversity.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        //
+	    private readonly IBus bus;
+
+	    public AccountController(IBus bus)
+	    {
+		    this.bus = bus;
+	    }
+
+	    //
         // GET: /Account/Login
 
         [AllowAnonymous]

@@ -16,3 +16,4 @@ _ReSharper.*
 *.swp
 packages
 *.nupkg
+App_Data
