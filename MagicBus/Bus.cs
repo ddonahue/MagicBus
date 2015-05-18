@@ -11,13 +11,13 @@ namespace MagicBus
 
 	public class Bus : IBus
 	{
-		private readonly SingleInstanceFactory singleInstanceFactory;
-		private readonly MultiInstanceFactory multiInstanceFactory;
+		private readonly SingleInstanceFactory commandHandlerFactory;
+		private readonly MultiInstanceFactory eventHandlersFactory;
 
-		public Bus(SingleInstanceFactory singleInstanceFactory, MultiInstanceFactory multiInstanceFactory)
+		public Bus(SingleInstanceFactory commandHandlerFactory, MultiInstanceFactory eventHandlersFactory)
 		{
-			this.singleInstanceFactory = singleInstanceFactory;
-			this.multiInstanceFactory = multiInstanceFactory;
+			this.commandHandlerFactory = commandHandlerFactory;
+			this.eventHandlersFactory = eventHandlersFactory;
 		}
 
 		public void Send(params ICommand[] commands)
@@ -47,7 +47,7 @@ namespace MagicBus
 			var handlerType = typeof(IHandler<>).MakeGenericType(command.GetType());
 			var handlerWrapperType = typeof (HandlerWrapper<>).MakeGenericType(command.GetType());
 
-			var handler = singleInstanceFactory(handlerType);
+			var handler = commandHandlerFactory(handlerType);
 			if (handler == null)
 				throw new NoHandlerFoundException(command.GetType());
 
@@ -59,7 +59,7 @@ namespace MagicBus
 			var handlerType = typeof(IHandler<>).MakeGenericType(@event.GetType());
 			var handlerWrapperType = typeof(HandlerWrapper<>).MakeGenericType(@event.GetType());
 
-			var handlers = multiInstanceFactory(handlerType);
+			var handlers = eventHandlersFactory(handlerType);
 			
 			return handlers.Select(handler => (IHandler<T>)Activator.CreateInstance(handlerWrapperType, handler));
 		}
