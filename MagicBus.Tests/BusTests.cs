@@ -11,21 +11,21 @@ namespace MagicBus.Tests
 		[Test]
 		public void Send_NullCommandsParameter_ShouldThrowException()
 		{
-			var sut = new Bus(new FakeHandlerFactory().GetCommandHandler, null);
+			var sut = new Bus(new HandlerFactoryTestHelper().GetCommandHandler, null);
 			Assert.Throws<ArgumentException>(() => sut.Send(null), "The commands parameter is null or empty.");
 		}
 
 		[Test]
 		public void Send_EmptyCommandsParameter_ShouldThrowException()
 		{
-			var sut = new Bus(new FakeHandlerFactory().GetCommandHandler, null);
+			var sut = new Bus(new HandlerFactoryTestHelper().GetCommandHandler, null);
 			Assert.Throws<ArgumentException>(() => sut.Send(new List<ICommand>().ToArray()), "The commands parameter is null or empty.");
 		}
 
 		[Test]
 		public void Send_NoHandlerFoundForCommand_ShouldThrowException()
 		{
-			var sut = new Bus(new FakeHandlerFactory().GetCommandHandler, null);
+			var sut = new Bus(new HandlerFactoryTestHelper().GetCommandHandler, null);
 			Assert.Throws<NoHandlerFoundException>(() => sut.Send(new NoMatchingHandlerCommand()));
 		}
 
@@ -33,7 +33,7 @@ namespace MagicBus.Tests
 		public void Send_HandlerFound_ShouldCallHandle()
 		{
 			var handler = new MatchingHandler();
-			var sut = new Bus(new FakeHandlerFactory(handler, null).GetCommandHandler, null);
+			var sut = new Bus(new HandlerFactoryTestHelper(handler).GetCommandHandler, null);
 
 			sut.Send(new MatchingHandlerCommand());
 
@@ -43,14 +43,14 @@ namespace MagicBus.Tests
 		[Test]
 		public void Publish_NullEventsParameter_ShouldThrowException()
 		{
-			var sut = new Bus(null, new FakeHandlerFactory().GetEventHandlers);
+			var sut = new Bus(null, new HandlerFactoryTestHelper().GetEventHandlers);
 			Assert.Throws<ArgumentException>(() => sut.Publish(null), "The events parameter is null or empty.");
 		}
 
 		[Test]
 		public void Publish_EmptyEventsParameter_ShouldThrowException()
 		{
-			var sut = new Bus(null, new FakeHandlerFactory().GetEventHandlers);
+			var sut = new Bus(null, new HandlerFactoryTestHelper().GetEventHandlers);
 			Assert.Throws<ArgumentException>(() => sut.Publish(new List<IEvent>().ToArray()), "The events parameter is null or empty.");
 		}
 
@@ -59,7 +59,7 @@ namespace MagicBus.Tests
 		{
 			var handler1 = new MatchingEventHandler1();
 			var handler2 = new MatchingEventHandler2();
-			var sut = new Bus(null, new FakeHandlerFactory(null, new IHandler<MatchingHandlerEvent>[] { handler1, handler2 }).GetEventHandlers);
+			var sut = new Bus(null, new HandlerFactoryTestHelper(new IHandler<MatchingHandlerEvent>[] { handler1, handler2 }).GetEventHandlers);
 
 			sut.Publish(new MatchingHandlerEvent());
 
@@ -110,14 +110,22 @@ namespace MagicBus.Tests
 		}
 	}
 
-	public class FakeHandlerFactory
+	public class HandlerFactoryTestHelper
 	{
 		private readonly IHandler<MatchingHandlerCommand> commandHandler;
 		private readonly IEnumerable<IHandler<MatchingHandlerEvent>> eventHandlers;
 
-		public FakeHandlerFactory() : this(null, null) { }
+		public HandlerFactoryTestHelper() : this(null, null) { }
 
-		public FakeHandlerFactory(IHandler<MatchingHandlerCommand> commandHandler, IEnumerable<IHandler<MatchingHandlerEvent>> eventHandlers)
+		public HandlerFactoryTestHelper(IHandler<MatchingHandlerCommand> commandHandler) : this(commandHandler, null)
+		{
+		}
+
+		public HandlerFactoryTestHelper(IEnumerable<IHandler<MatchingHandlerEvent>> eventHandlers) : this(null, eventHandlers)
+		{
+		}
+
+		private HandlerFactoryTestHelper(IHandler<MatchingHandlerCommand> commandHandler, IEnumerable<IHandler<MatchingHandlerEvent>> eventHandlers)
 		{
 			this.commandHandler = commandHandler;
 			this.eventHandlers = eventHandlers;
