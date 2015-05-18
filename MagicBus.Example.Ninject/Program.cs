@@ -11,8 +11,13 @@ namespace MagicBus.Example.Ninject
 		{
 			var bus = BootstrapBus();
 
-			var message = new TestMessage {Number = 42};
-			bus.Send(message);
+			var command = new TestCommand {Number = 42};
+			bus.Send(command);
+
+			var @event = new TestEvent {Letter = 'D' };
+			bus.Publish(@event);
+
+			Console.ReadLine();
 		}
 
 		private static IBus BootstrapBus()
@@ -20,7 +25,7 @@ namespace MagicBus.Example.Ninject
 			var kernel = new StandardKernel();
 			kernel.Components.Add<IBindingResolver, ContravariantBindingResolver>();
 			kernel.Bind(scan => scan.FromAssemblyContaining<IBus>().SelectAllClasses().BindDefaultInterface());
-			kernel.Bind(scan => scan.FromAssemblyContaining<TestMessage>().SelectAllClasses().BindAllInterfaces());
+			kernel.Bind(scan => scan.FromAssemblyContaining<TestCommand>().SelectAllClasses().BindAllInterfaces());
 			kernel.Bind<SingleInstanceFactory>().ToMethod(ctx => t => ctx.Kernel.Get(t));
 			kernel.Bind<MultiInstanceFactory>().ToMethod(ctx => t => ctx.Kernel.GetAll(t));
 
@@ -28,16 +33,38 @@ namespace MagicBus.Example.Ninject
 		}
 	}
 
-	public class TestMessage : ICommand
+	public class TestCommand : ICommand
 	{
 		public int Number { get; set; }
 	}
 
-	public class TestMessageHandler : IHandler<TestMessage>
+	public class TestCommandHandler : IHandler<TestCommand>
 	{
-		public void Handle(TestMessage message)
+		public void Handle(TestCommand command)
 		{
-			Console.WriteLine("The message I received was: {0}", message.Number);
+			Console.WriteLine("The command I received was: {0}", command.Number);
 		}
 	}
+
+	public class TestEvent : IEvent
+	{
+		public char Letter { get; set; }
+	}
+
+	public class TestEventHandler : IHandler<TestEvent>
+	{
+		public void Handle(TestEvent @event)
+		{
+			Console.WriteLine("The event I received was: {0}", @event.Letter);
+		}
+	}
+
+	public class TestIEventHandler : IHandler<IEvent>
+	{
+		public void Handle(IEvent message)
+		{
+			Console.WriteLine("Handle was called in IHandler<IEvent> catchall.");
+		}
+	}
+
 }
