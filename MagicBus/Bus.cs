@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using MagicBus.Exceptions;
 using MagicBus.Extensions;
 
 namespace MagicBus
 {
+	public delegate object SingleInstanceFactory(Type serviceType);
+	public delegate IEnumerable<object> MultiInstanceFactory(Type serviceType);
+
 	public class Bus : IBus
 	{
-		private readonly IHandlerFactory handlerFactory;
+		private readonly SingleInstanceFactory singleInstanceFactory;
+		private readonly MultiInstanceFactory multiInstanceFactory;
 
-		public Bus(IHandlerFactory handlerFactory)
+		public Bus(SingleInstanceFactory singleInstanceFactory, MultiInstanceFactory multiInstanceFactory)
 		{
-			this.handlerFactory = handlerFactory;
+			this.singleInstanceFactory = singleInstanceFactory;
+			this.multiInstanceFactory = multiInstanceFactory;
 		}
 
 		public void Send(params ICommand[] commands)
@@ -20,9 +25,11 @@ namespace MagicBus
 			if (commands.IsNullOrEmpty())
 				throw new ArgumentException("The commands parameter is null or empty.");
 
-			var sendInternal = typeof(Bus).GetMethod("SendInternal", BindingFlags.Instance | BindingFlags.NonPublic);
-
-			ExecuteMessageHandlers(commands, sendInternal);
+			foreach (var command in commands)
+			{
+				var handler = GetHandlerFor(command);
+				handler.Handle(command);
+			}
 		}
 
 		public void Publish(params IEvent[] events)
@@ -30,44 +37,46 @@ namespace MagicBus
 			if (events.IsNullOrEmpty())
 				throw new ArgumentException("The events parameter is null or empty.");
 
-			var publishInternal = typeof(Bus).GetMethod("PublishInternal", BindingFlags.Instance | BindingFlags.NonPublic);
-
-			ExecuteMessageHandlers(events, publishInternal);
+			foreach (var @event in events)
+				foreach (var handler in GetHandlersFor(@event))
+					handler.Handle(@event);
 		}
 
-		private void ExecuteMessageHandlers(IEnumerable<IMessage> messages, MethodInfo internalMethod)
+		private IHandler<T> GetHandlerFor<T>(T command) where T : class, ICommand
 		{
-			foreach (var message in messages)
-			{
-				try
-				{
-					internalMethod
-						.MakeGenericMethod(message.GetType())
-						.Invoke(this, new object[] {message});
-				}
-				catch (TargetInvocationException ex)
-				{
-					throw ex.InnerException;
-				}
-			}
-		}
+			var handlerType = typeof(IHandler<>).MakeGenericType(command.GetType());
+			var handlerWrapperType = typeof (HandlerWrapper<>).MakeGenericType(command.GetType());
 
-		// ReSharper disable once UnusedMember.Local
-		private void SendInternal<TCommand>(TCommand command) where TCommand : class, ICommand
-		{
-			var handler = handlerFactory.GetCommandHandler(command);
+			var handler = singleInstanceFactory(handlerType);
 			if (handler == null)
-				throw new NoHandlerFoundException<TCommand>();
+				throw new NoHandlerFoundException(command.GetType());
 
-			handler.Handle(command);
+			return (IHandler<T>)Activator.CreateInstance(handlerWrapperType, handler);
 		}
 
-		// ReSharper disable once UnusedMember.Local
-		private void PublishInternal<TEvent>(TEvent @event) where TEvent : class, IEvent
+		private IEnumerable<IHandler<T>> GetHandlersFor<T>(T @event) where T : class, IEvent
 		{
-			var handlers = handlerFactory.GetEventHandlers(@event);
-			foreach (var handler in handlers)
-				handler.Handle(@event);
+			var handlerType = typeof(IHandler<>).MakeGenericType(@event.GetType());
+			var handlerWrapperType = typeof(HandlerWrapper<>).MakeGenericType(@event.GetType());
+
+			var handlers = multiInstanceFactory(handlerType);
+			
+			return handlers.Select(handler => (IHandler<T>)Activator.CreateInstance(handlerWrapperType, handler));
+		}
+
+		private class HandlerWrapper<TMessage> : IHandler<IMessage> where TMessage : IMessage
+		{
+			private readonly IHandler<TMessage> inner;
+
+			public HandlerWrapper(IHandler<TMessage> inner)
+			{
+				this.inner = inner;
+			}
+
+			public void Handle(IMessage message)
+			{
+				inner.Handle((TMessage)message);
+			}
 		}
 	}
 }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("InMemoryServiceBus.HandlerFactory.Ninject.Tests")]
+[assembly: AssemblyTitle("MagicBus.Example.Ninject")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("InMemoryServiceBus.HandlerFactory.Ninject.Tests")]
+[assembly: AssemblyProduct("MagicBus.Example.Ninject")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("0b220854-60eb-4094-b859-d52c4e5e4a1d")]
+[assembly: Guid("ea220a25-ea3b-4264-8833-59e878e4ef71")]
 
 // Version information for an assembly consists of the following four values:
 //
