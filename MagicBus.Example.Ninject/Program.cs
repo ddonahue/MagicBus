@@ -25,7 +25,7 @@ namespace MagicBus.Example.Ninject
 			var kernel = new StandardKernel();
 			kernel.Components.Add<IBindingResolver, ContravariantBindingResolver>();
 			kernel.Bind(scan => scan.FromAssemblyContaining<IBus>().SelectAllClasses().BindDefaultInterface());
-			kernel.Bind(scan => scan.FromAssemblyContaining<TestCommand>().SelectAllClasses().BindAllInterfaces());
+			kernel.Bind(scan => scan.FromThisAssembly().SelectAllClasses().BindAllInterfaces());
 			kernel.Bind<SingleInstanceFactory>().ToMethod(ctx => t => ctx.Kernel.Get(t));
 			kernel.Bind<MultiInstanceFactory>().ToMethod(ctx => t => ctx.Kernel.GetAll(t));
 
@@ -66,5 +66,4 @@ namespace MagicBus.Example.Ninject
 			Console.WriteLine("Handle was called in IHandler<IEvent> catchall.");
 		}
 	}
-
 }
