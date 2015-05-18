@@ -1,7 +1,7 @@
 # MagicBus
 Insanely simple service bus written in .NET. Allows your app to use command and event semantics.
 
-I mostly work on this project for my own edification. It is inspired by other projects on GitHub including MediatR and SeptaBus.
+I mostly work on this project for my own edification. It is inspired by other projects on GitHub including [MediatR](https://github.com/jbogard/MediatR) and [SeptaBus](https://github.com/jkodroff/SeptaBus). It is also heavily inspired by [NServiceBus](http://particular.net/), and its author [Udi Dahan](http://www.udidahan.com/), whose writings got me interested in this style of development.
 
 MagicBus allows you to create in-memory messages with command and event semantics and send them to their appropriate handlers.
 
