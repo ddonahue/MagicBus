@@ -46,7 +46,6 @@
     <Compile Include="ICommand.cs" />
     <Compile Include="IEvent.cs" />
     <Compile Include="IHandler.cs" />
-    <Compile Include="IHandlerFactory.cs" />
     <Compile Include="IMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

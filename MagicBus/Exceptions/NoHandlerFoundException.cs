@@ -2,9 +2,9 @@
 
 namespace MagicBus.Exceptions
 {
-	public class NoHandlerFoundException<TMessage> : Exception where TMessage : IMessage
+	public class NoHandlerFoundException : Exception
 	{
-		public NoHandlerFoundException() : base(string.Format("No handlers registered for {0}", typeof(TMessage).Name))
+		public NoHandlerFoundException(Type t) : base(string.Format("No handlers registered for {0}", t.Name))
 		{
 		}
 	}
