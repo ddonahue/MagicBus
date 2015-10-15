@@ -1,0 +1,12 @@
+﻿<script language="javascript">
+    $(document).ready(function() {
+        $('.addPurchase').on('click', function(ev) {
+            ev.preventDefault();
+
+            var $this = $(this),
+            $form = $this.closest('div').children('form.addPurchaseForm');
+            
+            $form.submit();
+        });
+    });
+</script>

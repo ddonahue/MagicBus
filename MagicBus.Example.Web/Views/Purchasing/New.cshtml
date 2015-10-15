@@ -1,0 +1,10 @@
+﻿@model Guid
+
+<div>
+    <a href="#" class="addPurchase">Add new purchase</a>
+
+    <form class="addPurchaseForm" method="POST" action="@Url.Action("Add", "Purchasing")">
+        <input type="hidden" name="customerId" value="@Model"/>
+    </form>
+</div>
+

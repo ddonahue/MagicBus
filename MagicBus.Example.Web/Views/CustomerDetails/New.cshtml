@@ -1,0 +1,21 @@
+﻿@model  MagicBus.Example.Web.Models.CustomerDetailsViewModel
+
+@{
+    ViewBag.Title = "Create New Customer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create New Customer</h2>
+
+@using (Html.BeginForm("Create", "CustomerDetails", FormMethod.Post)) {
+    <div>
+    @Html.LabelFor(x => x.FirstName)
+    @Html.EditorFor(x => x.FirstName)
+    </div>
+    <div style="margin-top: 5px;">
+    @Html.LabelFor(x => x.LastName)
+    @Html.EditorFor(x => x.LastName)
+    </div>
+
+    <input type="submit" value="Submit" />
+}

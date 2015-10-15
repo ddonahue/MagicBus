@@ -1,0 +1,21 @@
+﻿@model List<MagicBus.Example.Web.Domain.CustomerDetails.DataAccess.CustomerDetails>
+
+<table>
+    <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Preferred Status</th>
+        <th>Total Purchases</th>
+    </tr>
+    @foreach (var customer in Model)
+    {
+        <tr>
+            <td>@customer.FirstName</td>
+            <td>@customer.LastName</td>
+            <td>@Html.Action("CustomerStatus", "Pricing", new { customerId = customer.CustomerId })</td>
+            <td>@Html.Action("Count", "Purchasing", new { customerId = customer.CustomerId })</td>
+            <td>@Html.Action("New", "Purchasing", new { customerId = customer.CustomerId })</td>
+        </tr> 
+    }
+        
+</table>

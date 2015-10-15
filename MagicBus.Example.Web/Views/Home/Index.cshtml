@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+@Html.Action("List", "CustomerDetails")
+
+@Html.ActionLink("Create a new customer", "New", "CustomerDetails")
+
+@section scripts
+{
+    @Html.Partial("~/Views/Purchasing/Scripts.cshtml")
+}
